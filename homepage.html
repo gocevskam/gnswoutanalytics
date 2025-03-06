@@ -9,7 +9,7 @@ window.engagement.boot({
     device_id: Math.random().toString(36).substring(2, 15),
     user_properties: {}
   },
-  integrations: []
+  integrations: [] // Set this up to tell G&S events where to go
 }).then(() => {
   console.log('Guides and Surveys SDK initialized successfully');
 }).catch((error) => {
