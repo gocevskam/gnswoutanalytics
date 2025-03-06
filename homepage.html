@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+   <!-- <script src="https://cdn.amplitude.com/script/3b307d78a06a4ea84cf295db012fad8d.js"></script>
+    <script src="https://cdn.amplitude.com/libs/plugin-session-replay-browser-1.12.1-min.js.gz"></script>
+    <script type="text/javascript" src="https://cdn.amplitude.com/script/3b307d78a06a4ea84cf295db012fad8d.experiment.js"></script>
+    
+    <script>
+    var sessionReplayTracking = window.sessionReplay.plugin({sampleRate: 1});
+        window.amplitude.add(sessionReplayTracking);
+        window.amplitude.init('3b307d78a06a4ea84cf295db012fad8d', {
+            fetchRemoteConfig: true,
+            autocapture: {
+            attribution: true,
+            pageViews: true,
+            sessions: true,
+            fileDownload: false,
+            formInteractions: false,
+            elementInteractions: false
+        },
+        });-->
+
+<script src="https://cdn.amplitude.com/script/b71ae36bd35219387da81d7923f5c132.engagement.js">
+
+        window.amplitude.add(window.engagement.plugin());
+        
+    </script>
+
+<link rel="shortcut icon" type="x-icon" href="PIC_URL.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sticky Notes</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 16px;
+            background: url('PIC_URL.png') no-repeat center center fixed;
+            background-size: cover;
+            background-color: rgba(255, 255, 255, 0.8);
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            display: flex;
+            justify-content: space-around;
+            padding: 80px 20px 20px;
+        }
+        .section {
+            width: 45%;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            height: 80vh;
+            overflow-y: auto;
+        }
+        .sticky-note {
+            background: yellow;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 10px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+            cursor: move;
+        }
+        .sticky-note textarea {
+            width: 100%;
+            height: 100px;
+            resize: none;
+            border: none;
+            outline: none;
+            background: transparent;
+        }
+        .sticky-note .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .sticky-note .actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #333;
+        }
+        .create-note {
+            position: fixed;
+            top: 20px;
+            left: 2.5%;
+            background: #333;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <button class="create-note" onclick="createNote()" id="hero-btn">Create Note</button>
+    <div class="container">
+        <div class="section" id="to-do">
+            <h2>To Do</h2>
+            <div id="to-do-notes"></div>
+        </div>
+        <div class="section" id="done">
+            <h2>Done</h2>
+            <div id="done-notes"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('hero-btn').addEventListener('click', function() {
+            amplitude.track('Create Note Clicked', {
+                button_name: "create_note",
+                source: "homepage"
+            });
+        });
+
+        function createNote() {
+            const note = document.createElement('div');
+            note.className = 'sticky-note';
+            note.innerHTML = `
+                <textarea placeholder="Write your note here..."></textarea>
+                <div class="actions">
+                    <button onclick="moveToDone(this)">Done</button>
+                    <button onclick="deleteNote(this)">Delete</button>
+                </div>
+            `;
+            document.getElementById('to-do-notes').appendChild(note);
+            makeDraggable(note);
+        }
+
+        function moveToDone(button) {
+            const note = button.closest('.sticky-note');
+            document.getElementById('to-do-notes').removeChild(note);
+            document.getElementById('done-notes').appendChild(note);
+            button.remove(); 
+
+            amplitude.track('Note Moved to Done', {
+                button_name: "done",
+                source: "sticky_note"
+            });
+        }
+
+        function deleteNote(button) {
+            const note = button.closest('.sticky-note');
+            const parentSection = note.parentElement.id === 'done-notes' ? 'done' : 'to_do';
+            note.remove();
+            
+            amplitude.track('Note Deleted', {
+                button_name: "delete",
+                source: "sticky_note",
+                section: parentSection
+            });
+        }
+
+        function makeDraggable(element) {
+            element.draggable = true;
+            element.addEventListener('dragstart', (event) => {
+                event.dataTransfer.setData('text/plain', event.target.id);
+            });
+            element.addEventListener('dragover', (event) => {
+                event.preventDefault();
+            });
+            element.addEventListener('drop', (event) => {
+                event.preventDefault();
+                const data = event.dataTransfer.getData('text/plain');
+                const draggableElement = document.getElementById(data);
+                event.target.appendChild(draggableElement);
+            });
+        }
+    </script>
+</body>
+</html>
