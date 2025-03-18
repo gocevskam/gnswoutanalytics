@@ -1,21 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+<script src="https://cdn.amplitude.com/script/4cdb21bcd73879bcb047679ef95167e6.js"></script><script>window.amplitude.init('4cdb21bcd73879bcb047679ef95167e6', {"fetchRemoteConfig":true,"autocapture":true});</script>
     
-<script src="https://cdn.amplitude.com/script/b71ae36bd35219387da81d7923f5c132.engagement.js"></script>
-<script>
-window.engagement.boot({
-  user: {
-    device_id: Math.random().toString(36).substring(2, 15),
-    user_properties: {}
-  },
-  integrations: [] // Set this up to tell G&S events where to go
-}).then(() => {
-  console.log('Guides and Surveys SDK initialized successfully');
-}).catch((error) => {
-  console.error('Failed to initialize Guides and Surveys SDK:', error);
-});
-</script>
+<script src="https://cdn.amplitude.com/script/4cdb21bcd73879bcb047679ef95167e6.engagement.js"></script>
+<script>amplitude.add(window.engagement.plugin())</script>
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
