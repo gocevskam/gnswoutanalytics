@@ -81,8 +81,7 @@
     </style>
 </head>
 <body>
-    <button class="create-note" onclick="createNote()">Create Note</button>
-
+    <button class="create-note" onclick="createNote()" id="hero-btn">Create Note</button>
     <div class="container">
         <div class="section" id="to-do">
             <h2>To Do</h2>
@@ -92,9 +91,20 @@
             <h2>Done</h2>
             <div id="done-notes"></div>
         </div>
+        <div class="section" id="external-content">
+            <h2>Conciertos Muchachito</h2>
+            <iframe src="https://www.muchachitobomboinfierno.net/" width="100%" height="100%" style="border: none;"></iframe>
+        </div>
     </div>
 
     <script>
+        document.getElementById('hero-btn').addEventListener('click', function() {
+            amplitude.track('Create Note Clicked', {
+                button_name: "create_note",
+                source: "homepage"
+            });
+        });
+
         function createNote() {
             const note = document.createElement('div');
             note.className = 'sticky-note';
@@ -113,12 +123,24 @@
             const note = button.closest('.sticky-note');
             document.getElementById('to-do-notes').removeChild(note);
             document.getElementById('done-notes').appendChild(note);
-            button.remove();
+            button.remove(); 
+            
+            amplitude.track('Note Moved to Done', {
+                button_name: "done",
+                source: "sticky_note"
+            });
         }
 
         function deleteNote(button) {
             const note = button.closest('.sticky-note');
+            const parentSection = note.parentElement.id === 'done-notes' ? 'done' : 'to_do';
             note.remove();
+            
+            amplitude.track('Note Deleted', {
+                button_name: "delete",
+                source: "sticky_note",
+                section: parentSection
+            });
         }
 
         function makeDraggable(element) {
@@ -136,141 +158,6 @@
                 event.target.appendChild(draggableElement);
             });
         }
-    </script>
-        <form id="userForm">
-        <h2>User Information Form</h2>
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required>
-
-        <label for="email">Email Address:</label>
-        <input type="email" id="email" name="email" required>
-
-        <button type="button" onclick="submitForm()">Submit</button>
-
-        <div id="contactCard" style="display: none; margin-top: 20px;"></div>
-    </form>
-
-    <iframe id="myFrame" width="300" height="200"></iframe>
-
-    <script>
-        // Preload iframe content
-        window.onload = function () {
-            var iframeContent = '<button onclick="parent.logAmplitudeEvent()">Log Amplitude Event</button>';
-            var iframe = document.getElementById('myFrame');
-            var iframeDoc = iframe.contentWindow.document;
-            iframeDoc.open();
-            iframeDoc.write(iframeContent);
-            iframeDoc.close();
-        };
-
-        function submitForm() {
-            var name = document.getElementById("name").value;
-            var email = document.getElementById("email").value;
-
-            // Check for empty fields
-            if (name.trim() === "" || email.trim() === "") {
-                displayError("Name and Email cannot be empty.");
-                return;
-            }
-
-            // Check for valid email
-            if (!isValidEmail(email)) {
-                displayError("Invalid Email Address.");
-                return;
-            }
-
-            // Display contact card
-            var contactCardDiv = document.getElementById("contactCard");
-            if (!contactCardDiv) {
-                return; // Abort if contactCardDiv is null
-            }
-            contactCardDiv.innerHTML = "<h2>Contact Card</h2><p>Name: " + name + "</p><p>Email: " + email + "</p>";
-            contactCardDiv.style.display = "block";
-
-            // Show the download button
-            var downloadButtonContainer = document.createElement("div");
-            downloadButtonContainer.classList.add("button-container");
-            var downloadButton = document.createElement("button");
-            downloadButton.innerHTML = "Download";
-            downloadButton.type = "button";
-            downloadButton.onclick = downloadContactCard;
-            downloadButton.classList.add("download-button"); // Add class for styling
-
-            downloadButton.style.backgroundColor = variant.payload.backgroundColor;
-            downloadButton.addEventListener("mouseout", function () {
-                downloadButton.style.backgroundColor = variant.payload.backgroundColor;
-            });
-            downloadButton.addEventListener("mouseover", function () {
-                downloadButton.style.backgroundColor = variant.payload.hoverColor;
-            });
-            downloadButton.style.display = 'block'
-            downloadButton.style.margin = 'auto'
-
-            downloadButton.style.display = "block";
-            downloadButtonContainer.appendChild(downloadButton);
-            contactCardDiv.appendChild(downloadButtonContainer);
-        }
-
-        function downloadContactCard() {
-            var name = document.getElementById("name").value;
-            var email = document.getElementById("email").value;
-
-            // Check for empty fields
-            if (name.trim() === "" || email.trim() === "") {
-                alert("Name and email cannot be empty.");
-                return;
-            }
-
-            // Check for valid email
-            if (!isValidEmail(email)) {
-                alert("Invalid email address.");
-                return;
-            }
-
-            // Generate text content for download
-            var contactCardText = "Name: " + name + "\nEmail: " + email;
-
-            // Create a Blob containing the text
-            var blob = new Blob([contactCardText], { type: "text/plain;charset=utf-8" });
-
-            // Create a link element to trigger the download
-            var a = document.createElement("a");
-            a.href = window.URL.createObjectURL(blob);
-            a.download = "contact_card.txt";
-
-            // Append the link to the document and trigger the download
-            document.body.appendChild(a);
-            a.click();
-
-            // Remove the link from the document
-            document.body.removeChild(a);
-        }
-
-        function isValidEmail(email) {
-            // Simple email validation
-            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return emailRegex.test(email);
-        }
-
-        function displayError(message) {
-            var contactCardDiv = document.getElementById("contactCard");
-            contactCardDiv.innerHTML = "<p style='color: red;'>" + message + "</p>";
-            contactCardDiv.style.display = "block";
-        }
-
-        function resetError() {
-            var contactCardDiv = document.getElementById("contactCard");
-            if (contactCardDiv) {
-                contactCardDiv.innerHTML = "";
-                contactCardDiv.style.display = "none";
-            }
-        }
-
-
-        window.logAmplitudeEvent = function () {
-            amplitude.track('Home Screen Viewed');
-        }
-
     </script>
 </body>
 </html>
